@@ -27,6 +27,7 @@ WebServer server(80);
 bool scanfingers = false;
 bool addfinger = false;
 HTTPClient http;
+int sessionid = -1;
 
 
 void setup() {
@@ -232,8 +233,9 @@ void scanHandler() {
   if (server.hasHeader("Authorization")) {
     String authHeader = server.header("Authorization");
     if (authHeader == AUTH_HEADER) {
-      if (server.hasArg("action")) {
+      if (server.hasArg("action") && server.hasArg("sessionid")) {
         String scan = server.arg("action");
+        sessionid = server.arg("sessionid").toInt();
         if (scan == "start") {
           scanfingers = true;
           addfinger = false;
@@ -246,7 +248,7 @@ void scanHandler() {
           server.send(400, "text/plain", "please specify start or stop");
         }
       } else {
-        server.send(400, "text/plain", "please specify an ?action");
+        server.send(400, "text/plain", "please specify an ?action and sessionid");
       }
 
     } else {
@@ -326,11 +328,13 @@ int signHandler() {
   // Your custom headers
   http.begin(API_ENDPOINT);
   http.addHeader("Content-Type", "application/json");
-  http.addHeader("Authorization", "Bearer your-access-token");
+  http.addHeader("Authorization", API_AUTH);
 
   // Your POST data
   String postData = "{\"id\":";
   postData += finger.fingerID;
+  postData += ",\"sessionid\":";
+  postData += sessionid;
   postData += "}";
   Serial.println(postData);
   int httpResponseCode = http.POST(postData);
