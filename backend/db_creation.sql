@@ -75,7 +75,28 @@ insert into tbl_Students values
 
 select * from tbl_StudentUnits;
 select * from tbl_Units;
+select * from tbl_Fingerprints;
+select * from tbl_Attendance;
+select * from tbl_Sessions;
 #insert into tbl_units
 insert into tbl_StudentUnits values
 (1031891,"CMT201"),
 (1031891,"CMT109");
+
+insert into tbl_Sessions(UnitCode,Date,Venue) Values ("CMT448","1998-12-1","jubilee");
+delete from tbl_Sessions where UnitCode = "CMT448";
+
+-- cheat a bit for advanced stuff
+DELIMITER $$
+create trigger update_attendance after insert on tbl_Sessions 
+for each row
+begin
+INSERT INTO tbl_Attendance (sessionID, AdmissionNo, Attendend) SELECT NEW.sessionID, AdmissionNo, FALSE FROM tbl_StudentUnits WHERE UnitCode = NEW.UnitCode;
+end$$
+DELIMITER ;
+drop trigger update_attendance;
+
+UPDATE tbl_Attendance join tbl_Fingerprints on tbl_Attendance.AdmissionNo = tbl_Fingerprints.AdmissionNo set tbl_Attendance.Attendend = FALSE where sessionID=10 and tbl_Fingerprints.RightFinger = 1 or tbl_Fingerprints.LeftFinger = 1;
+
+
+SELECT tbl_Attendance.sessionID, tbl_Fingerprints.AdmissionNo FROM tbl_Attendance JOIN tbl_Fingerprints ON tbl_Attendance.AdmissionNo = tbl_Fingerprints.AdmissionNo WHERE tbl_Attendance.sessionID = 10  AND (tbl_Fingerprints.RightFinger = 3 OR tbl_Fingerprints.LeftFinger = 3);
