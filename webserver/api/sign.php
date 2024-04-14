@@ -37,6 +37,8 @@ if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
                 http_response_code(403);
                 echo json_encode(array("message" => "not allowed"));
             }
+            $stmt->close();
+            $conn->close();
         } else {
             http_response_code(400);
             echo json_encode(array("message" => "body required"));
@@ -50,7 +52,6 @@ if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
     http_response_code(400);
     echo json_encode(array("message" => "Authorization required"));
 }
-$stmt->close();
-$conn->close();
+
 
 ?>
