@@ -108,7 +108,7 @@ function getSessions()
         echo "<td>$unitcode</td>";
         echo "<td>$date</td>";
         echo "<td>$venue</td>";
-        echo "<td><a href='homepage.php?attendance_id=" . $sessionid . "#attendance' class='w3-button w3-small w3-padding w3-green' onlick=>Attendace</a></td>";
+        echo "<td><a href='homepage.php?attendance_id=" . $sessionid . "#attendance' class='w3-button w3-small w3-padding w3-green'>Attendace</a></td>";
         echo "<tr>";
     }
 }
@@ -310,11 +310,11 @@ function getSessionAttendance(int $id)
         <div class="w3-modal" id="sessionform">
             <form class="w3-modal-content w3-display-middle w3-round w3-padding" action="homepage.php" method="post">
                 <div class="w3-container">
-                    <label for unitcode="unitcode">UnitCode</label></br>
+                    <label for unitcode="unitcode">UnitCode</label><br>
                     <input class="w3-input w3-border" type="text" name="unitcode" placeholder="UnitCode">
-                    <label for date="date">Date</label></br>
+                    <label for date="date">Date</label><br>
                     <input class="w3-input w3-border" type="text" name="date" placeholder="Date">
-                    <label for venue="venue">Venue</label></br>
+                    <label for venue="venue">Venue</label><br>
                     <input class="w3-input w3-border" type="text" name="venue" placeholder="Venue">
                     <input type="hidden" type="text" name="action" value="newsession">
                 </div>
@@ -352,9 +352,9 @@ function getSessionAttendance(int $id)
         <div class="w3-modal w3-card-4" id="unitform">
             <form class="w3-modal-content w3-round w3-padding w3-display-middle" action="homepage.php" method="post">
                 <div class="w3-container">
-                    <label for unitcode="unitcode">UnitCode</label></br>
+                    <label for unitcode="unitcode">UnitCode</label><br>
                     <input class="w3-input w3-border w3-padding" type="text" name="unitcode" placeholder="UnitCode">
-                    <label for unitname="unitname">UnitName</label></br>
+                    <label for unitname="unitname">UnitName</label><br>
                     <input class="w3-input w3-border w3-padding" type="text" name="unitname" placeholder="UnitName">
                     <input type="hidden" type="text" name="action" value="newunit">
                 </div>
@@ -399,24 +399,24 @@ function getSessionAttendance(int $id)
         <!-- student form !-->
         <div class="w3-modal w3-card-4" id="studentform">
             <form class="w3-modal-content w3-round w3-padding" action="homepage.php" method="post">
-                <label for studentadm="admission">Admission Number</label></br>
+                <label for studentadm="admission">Admission Number</label><br>
                 <input class="w3-input w3-padding w3-border" type="text" placeholder="Admission Number" name="admno">
-                <label for studentfname="fname">First Name</label></br>
+                <label for studentfname="fname">First Name</label><br>
                 <input class="w3-input w3-padding w3-border" type="text" placeholder="First Name" name="fname">
-                <label for studentlname="lname">Last Name</label></br>
+                <label for studentlname="lname">Last Name</label><br>
                 <input class="w3-input w3-padding w3-border" type="text" placeholder="Last Name" name="lname">
-                <label for studentemail="email">Email</label></br>
+                <label for studentemail="email">Email</label><br>
                 <input class="w3-input w3-padding w3-border" type="text" placeholder="Email" name="email">
-                <label for studentphone="phone">Phone Number</label></br>
+                <label for studentphone="phone">Phone Number</label><br>
                 <input class="w3-input w3-padding w3-border" type="text" placeholder="Phone Number" name="phoneno">
-                <label for studentfinger="fingers">FingerPrints</label></br>
+                <label for studentfinger="fingers">FingerPrints</label><br>
                 <div class="w3-bar">
                     <button class="w3-bar-item w3-button w3-padding w3-round w3-green w3-right" type="button" onclick="doGetRightFinger();">Get RightFinger</button>
                     <input class="w3-bar-item  w3-input w3-border w3-right" id="rfinger" name="rfinger" type="number" readonly>
                     <input class="w3-bar-item  w3-input w3-border w3-left" id="lfinger" name="lfinger" type="number" readonly>
                     <button class="w3-bar-item w3-button w3-padding w3-round w3-green w3-left" type="button" onclick="doGetLeftFinger();">Get LeftFinger</button>
                 </div>
-                </br>
+                <br>
                 <div class="w3-bar">
                     <button class="w3-bar-item w3-button w3-padding w3-round w3-green w3-left w3-green" type="submit">Create</button>
                     <button class="w3-bar-item w3-button w3-padding w3-round w3-red w3-right w3-left" type="button" onclick="document.getElementById('studentform').style.display='none';">Cancel</button>
@@ -453,9 +453,9 @@ function getSessionAttendance(int $id)
         <div class="w3-modal w3-card-4" id="studentunitform">
             <form class="w3-modal-content w3-round w3-padding w3-display-middle" action="homepage.php" method="post">
                 <div class="w3-container">
-                    <label for unitcode="unitcode">UnitCode</label></br>
+                    <label for unitcode="unitcode">UnitCode</label><br>
                     <input class="w3-input w3-border w3-padding" type="text" name="unitcode" placeholder="UnitCode">
-                    <label for admissionno="admissionno">AdmissionNo</label></br>
+                    <label for admissionno="admissionno">AdmissionNo</label><br>
                     <input class="w3-input w3-border w3-padding" type="text" name="admno" placeholder="AdmissionNo">
                     <input type="hidden" type="text" name="action" value="newstudentunit">
                 </div>
