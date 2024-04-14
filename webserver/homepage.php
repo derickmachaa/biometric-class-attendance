@@ -55,6 +55,15 @@ if (!isset($_SESSION['username'])) {
                     exit();
                 }
             }
+        } else
+        if ($action === "newstudentunit") {
+            $stmt = $conn->prepare("INSERT INTO tbl_StudentUnits(UnitCode,AdmissionNo) values (?,?)");
+            $stmt->bind_param("ss", $_POST['unitcode'], $_POST['admno']);
+            $stmt->execute();
+            if (mysqli_affected_rows($conn) == 1) {
+                header("Location: homepage.php#studentunits");
+                exit();
+            }
         }
     }
 }
@@ -99,6 +108,7 @@ function getSessions()
         echo "<td>$unitcode</td>";
         echo "<td>$date</td>";
         echo "<td>$venue</td>";
+        echo "<td><a href='homepage.php?attendance_id=" . $sessionid . "#attendance' class='w3-button w3-small w3-padding w3-green' onlick=>Attendace</a></td>";
         echo "<tr>";
     }
 }
@@ -141,7 +151,45 @@ function getStudents()
         echo "<tr>";
     }
 }
-
+function getStudentUnits()
+{
+    $stmt = $GLOBALS['conn']->prepare('SELECT * from tbl_StudentUnits order by unitcode');
+    $unitcode = "";
+    $admno = "";
+    $stmt->bind_result($unitcode, $admno);
+    $stmt->execute();
+    while ($stmt->fetch()) {
+        echo "<tr>";
+        echo "<td>$unitcode</td>";
+        echo "<td>$admno</td>";
+        echo "<tr>";
+    }
+}
+function getSessionAttendance(int $id)
+{
+    $stmt = $GLOBALS['conn']->prepare('select UnitCode,Date,Venue,AdmissionNo,Attendend from tbl_Attendance inner join tbl_Sessions on tbl_Sessions.SessionID = tbl_Attendance.SessionID where tbl_Sessions.SessionID=?;');
+    $stmt->bind_param("d", $id);
+    $admno = "";
+    $unitcode = "";
+    $date = "";
+    $venue = "";
+    $attended = "";
+    $stmt->bind_result($unitcode, $date, $venue, $admno, $attended);
+    $stmt->execute();
+    while ($stmt->fetch()) {
+        echo "<tr>";
+        echo "<td>$unitcode</td>";
+        echo "<td>$date</td>";
+        echo "<td>$venue</td>";
+        echo "<td>$admno</td>";
+        if ($attended) {
+            echo "<td><input class='w3-check' type='checkbox' checked='checked'></td>";
+        } else {
+            echo "<td><input class='w3-check' type='checkbox'></td>";
+        }
+        echo "<tr>";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -155,7 +203,7 @@ function getStudents()
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
         html,
-        body{
+        body {
             font-family: "Raleway", sans-serif
         }
     </style>
@@ -165,7 +213,7 @@ function getStudents()
 
     <!-- Top container -->
     <div class="w3-bar w3-top w3-blue-grey w3-large">
-        <span class="w3-bar-item w3-left w3-text-white" >     Hi  <strong><?php echo $_SESSION['username']; ?></strong></span>
+        <span class="w3-bar-item w3-left w3-text-white">     Hi  <strong><?php echo $_SESSION['username']; ?></strong></span>
         <a href="logout.php" class="w3-bar-item w3-right w3-button">LOGOUT</a>
     </div>
 
@@ -179,6 +227,8 @@ function getStudents()
             <a href="#units" class="w3-bar-item w3-button w3-padding w3-large"><i>Units</i></a>
             <a href="#students" class="w3-bar-item w3-button w3-padding w3-large">Students</a>
             <a href="#sessions" class="w3-bar-item w3-button w3-padding w3-large"><i> Sessions</i></a>
+            <a href="#studentunits" class="w3-bar-item w3-button w3-padding w3-large"><i> StudentUnits</i></a>
+
         </div>
     </nav>
 
@@ -250,6 +300,7 @@ function getStudents()
                     <td>UnitCode</td>
                     <td>Date</td>
                     <td>Venue</td>
+                    <td></td>
                 </tr>
                 <?php getSessions(); ?>
             </table>
@@ -297,7 +348,7 @@ function getStudents()
             </table>
         </div>
 
-        <!-- div for new session form !-->
+        <!-- div for new unit form !-->
         <div class="w3-modal w3-card-4" id="unitform">
             <form class="w3-modal-content w3-round w3-padding w3-display-middle" action="homepage.php" method="post">
                 <div class="w3-container">
@@ -377,6 +428,75 @@ function getStudents()
 
     </div>
     <!-- end of student section !-->
+
+
+
+    <!-- begin of student_unit section !-->
+    <div class="w3-main" id="studentunits" style="margin-left:300px;height:100vh;">
+        <!-- Header -->
+        <header class="w3-bar w3-orange" style="padding-top:50px;">
+            <b class="w3-bar-item">Student Units</b>
+            <button class="w3-bar-item w3-button w3-right w3-green" style="height:100%" type="button" onclick="document.getElementById('studentunitform').style.display='block'"><b>Create Student Unit</b></button>
+        </header>
+        <!-- div table for student-units !-->
+        <div>
+            <table class="w3-table-all w3-card-4">
+                <tr class="w3-red">
+                    <td>UnitCode</td>
+                    <td>Admission Number</td>
+                </tr>
+                <?php getStudentUnits(); ?>
+            </table>
+        </div>
+
+        <!-- div for new unit form !-->
+        <div class="w3-modal w3-card-4" id="studentunitform">
+            <form class="w3-modal-content w3-round w3-padding w3-display-middle" action="homepage.php" method="post">
+                <div class="w3-container">
+                    <label for unitcode="unitcode">UnitCode</label></br>
+                    <input class="w3-input w3-border w3-padding" type="text" name="unitcode" placeholder="UnitCode">
+                    <label for admissionno="admissionno">AdmissionNo</label></br>
+                    <input class="w3-input w3-border w3-padding" type="text" name="admno" placeholder="AdmissionNo">
+                    <input type="hidden" type="text" name="action" value="newstudentunit">
+                </div>
+                <div class="w3-container">
+                    <button class="w3-button w3-green w3-left" type="submit">Create </button>
+                    <button class="w3-button w3-red w3-right" type="button" onclick="document.getElementById('studentunitform').style.display='none'">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- end of student unit section !-->
+
+    <!-- begin of attendance section !-->
+    <div class="w3-main" id="attendance" style="margin-left:300px;height:100vh;">
+        <!-- Header -->
+        <header class="w3-bar w3-orange" style="padding-top:50px;">
+            <b class="w3-bar-item">Session Attendance</b>
+            <button class="w3-bar-item w3-button w3-right w3-green" style="height:100%" type="button" onclick="handleAttendance();"><b id="attendance_value">Start Attendance</b></button>
+        </header>
+        <!-- div table for unit attendance !-->
+        <div>
+            <table class="w3-table-all w3-card-4">
+                <tr class="w3-red">
+                    <td>UnitCode</td>
+                    <td>Date</td>
+                    <td>Venue</td>
+                    <td>Admission Number</td>
+                    <td>Attended</td>
+
+
+                </tr>
+                <?php
+                if (isset($_GET['attendance_id'])) {
+                    $id = $_GET['attendance_id'];
+                    getSessionAttendance($id);
+                }
+                ?>
+            </table>
+        </div>
+    </div>
+    <!-- end of student unit attendance !-->
 
 
     <script>
@@ -471,6 +591,37 @@ function getStudents()
                 alert("Close and open create dialog again");
 
             }
+        }
+
+        function handleAttendance() {
+            var attendance_btn = document.getElementById('attendance_value');
+            var scanner = "";
+            if (attendance_btn.innerHTML.toString() == "Start Attendance") {
+                scanner="start";
+                attendance_btn.innerHTML = "Stop Attendance";
+            } else {
+                scanner = "stop";
+                attendance_btn.innerHTML = "Start Attendance";
+            }
+            const apiUrl = 'http://192.168.43.170/scanner?action='+scanner+'&sessionid='+10;
+            fetch(apiUrl, {
+                    headers: {
+                        "Authorization": "derick"
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    // Process the retrieved user data
+                    data.toString();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         }
     </script>
 
