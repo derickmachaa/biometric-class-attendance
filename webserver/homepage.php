@@ -165,31 +165,7 @@ function getStudentUnits()
         echo "<tr>";
     }
 }
-function getSessionAttendance(int $id)
-{
-    $stmt = $GLOBALS['conn']->prepare('select UnitCode,Date,Venue,AdmissionNo,Attendend from tbl_Attendance inner join tbl_Sessions on tbl_Sessions.SessionID = tbl_Attendance.SessionID where tbl_Sessions.SessionID=?;');
-    $stmt->bind_param("d", $id);
-    $admno = "";
-    $unitcode = "";
-    $date = "";
-    $venue = "";
-    $attended = "";
-    $stmt->bind_result($unitcode, $date, $venue, $admno, $attended);
-    $stmt->execute();
-    while ($stmt->fetch()) {
-        echo "<tr>";
-        echo "<td>$unitcode</td>";
-        echo "<td>$date</td>";
-        echo "<td>$venue</td>";
-        echo "<td>$admno</td>";
-        if ($attended) {
-            echo "<td><input class='w3-check' type='checkbox' checked='checked'></td>";
-        } else {
-            echo "<td><input class='w3-check' type='checkbox'></td>";
-        }
-        echo "<tr>";
-    }
-}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -477,22 +453,14 @@ function getSessionAttendance(int $id)
         </header>
         <!-- div table for unit attendance !-->
         <div>
-            <table class="w3-table-all w3-card-4">
+            <table class="w3-table-all w3-card-4" id="attendance-table">
                 <tr class="w3-red">
                     <td>UnitCode</td>
                     <td>Date</td>
                     <td>Venue</td>
                     <td>Admission Number</td>
                     <td>Attended</td>
-
-
                 </tr>
-                <?php
-                if (isset($_GET['attendance_id'])) {
-                    $id = $_GET['attendance_id'];
-                    getSessionAttendance($id);
-                }
-                ?>
             </table>
         </div>
     </div>
@@ -503,6 +471,9 @@ function getSessionAttendance(int $id)
         var available_slot = -1;
         var rfinger = -1;
         var lfinger = -1;
+        var seen = [];
+        var intervalId = -1;
+
 
         //get the various values
 
@@ -593,17 +564,72 @@ function getSessionAttendance(int $id)
             }
         }
 
+        function populateAttendance(data) {
+            // get the attendance table
+            const table = document.getElementById("attendance-table");
+            //iterate through the data
+            data.forEach(item => {
+                //check if data in seen to avoid repetition
+
+
+                //get the current row
+                var existingRow = table.querySelector(`tr[data-id="${item.admissionno}"]`);
+                // If the row doesn't exist, create a new one
+                if (!existingRow) {
+                    //get the cells of the table
+                    var row = table.insertRow();
+                    row.setAttribute("data-id", item.admissionno);
+                    var ucode = row.insertCell(0);
+                    var dt = row.insertCell(1);
+                    var venue = row.insertCell(2);
+                    var adm = row.insertCell(3);
+                    var attend = row.insertCell(4);
+                    //create a check box for attendance
+                    var checkbox = document.createElement("input");
+                    checkbox.type = "checkbox";
+                    checkbox.classList.add("w3-input");
+                    checkbox.id=item.admissionno;
+                    attend.appendChild(checkbox);
+
+                } else {
+                    var row = existingRow;
+                    var ucode = row.cells[0];
+                    var dt = row.cells[1];
+                    var venue = row.cells[2];
+                    var adm = row.cells[3];
+                    var attend = row.cells[4];
+                    ucode.textContent = '';
+                    dt.textContent = '';
+                    venue.textContent = '';
+                    adm.textContent = '';
+                    document.getElementById(item.admissionno).checked = false;
+
+                }
+
+                //add content now
+                ucode.textContent = item.unitcode;
+                dt.textContent = item.date;
+                venue.textContent = item.venue;
+                adm.textContent = item.admissionno;
+                document.getElementById(item.admissionno).checked = item.attended;
+
+            });
+        }
+
         function handleAttendance() {
             var attendance_btn = document.getElementById('attendance_value');
             var scanner = "";
             if (attendance_btn.innerHTML.toString() == "Start Attendance") {
-                scanner="start";
+                scanner = "start";
                 attendance_btn.innerHTML = "Stop Attendance";
+                intervalId = setInterval(fetchAndPopulateTable, 1000);
             } else {
                 scanner = "stop";
                 attendance_btn.innerHTML = "Start Attendance";
+                clearInterval(intervalId);
             }
-            const apiUrl = 'http://192.168.43.170/scanner?action='+scanner+'&sessionid='+10;
+            var sessionid =  window.location.search.split('=')[1];
+            const apiUrl = 'http://192.168.43.170/scanner?action=' + scanner + '&sessionid=' + sessionid;
             fetch(apiUrl, {
                     headers: {
                         "Authorization": "derick"
@@ -622,6 +648,19 @@ function getSessionAttendance(int $id)
                 .catch(error => {
                     console.error('Error:', error);
                 });
+        }
+
+        function fetchAndPopulateTable() {
+            var sessionid =  window.location.search.split('=')[1];
+            fetch('api/attendance.php?id='+sessionid, {
+                    method: 'GET',
+                    credentials: 'include' // Include session information
+                })
+                .then(response => response.json())
+                .then(data => {
+                    populateAttendance(data);
+                })
+                .catch(error => console.error('Error:', error));
         }
     </script>
 
