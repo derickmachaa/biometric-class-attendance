@@ -165,6 +165,31 @@ function getStudentUnits()
         echo "<tr>";
     }
 }
+function getSessionAttendance(int $id)
+{
+    $stmt = $GLOBALS['conn']->prepare('select UnitCode,Date,Venue,AdmissionNo,Attendend from tbl_Attendance inner join tbl_Sessions on tbl_Sessions.SessionID = tbl_Attendance.SessionID where tbl_Sessions.SessionID=?;');
+    $stmt->bind_param("d", $id);
+    $admno = "";
+    $unitcode = "";
+    $date = "";
+    $venue = "";
+    $attended = "";
+    $stmt->bind_result($unitcode, $date, $venue, $admno, $attended);
+    $stmt->execute();
+    while ($stmt->fetch()) {
+        echo "<tr data-id='$admno'>";
+        echo "<td>$unitcode</td>";
+        echo "<td>$date</td>";
+        echo "<td>$venue</td>";
+        echo "<td>$admno</td>";
+        if ($attended) {
+            echo "<td><input class='w3-check' type='checkbox' id='$admno' checked='checked'></td>";
+        } else {
+            echo "<td><input class='w3-check' type='checkbox' id='$admno'></td>";
+        }
+        echo "</tr>";
+    }
+}
 
 ?>
 <!DOCTYPE html>
@@ -461,6 +486,12 @@ function getStudentUnits()
                     <td>Admission Number</td>
                     <td>Attended</td>
                 </tr>
+                <?php
+                if (isset($_GET['attendance_id'])) {
+                    $id = $_GET['attendance_id'];
+                    getSessionAttendance($id);
+                }
+                ?>
             </table>
         </div>
     </div>
@@ -587,7 +618,7 @@ function getStudentUnits()
                     //create a check box for attendance
                     var checkbox = document.createElement("input");
                     checkbox.type = "checkbox";
-                    checkbox.classList.add("w3-input");
+                    checkbox.classList.add("w3-check");
                     checkbox.id=item.admissionno;
                     attend.appendChild(checkbox);
 
