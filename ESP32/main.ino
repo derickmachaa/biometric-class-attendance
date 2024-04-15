@@ -72,8 +72,12 @@ void setup() {
   // configure and start the webserver
   //handle actions to the scanner
   server.on(F("/scanner"), HTTP_GET, scanHandler);
-  // configure actions to register fingerprint
+  server.on(F("/scanner"), HTTP_OPTIONS, optionsHandler);
+
+  // configure actions to register fingerprint added options for cors errors
   server.on(F("/register"), HTTP_GET, registerHandler);
+  server.on(F("/register"), HTTP_OPTIONS, optionsHandler);
+
   // configure actions to delete fingerprints
   server.on(F("/delete"), HTTP_GET, deleteHandler);
   server.begin();
@@ -239,9 +243,13 @@ void scanHandler() {
         if (scan == "start") {
           scanfingers = true;
           addfinger = false;
+          server.sendHeader("Access-Control-Allow-Origin", "*");
+          server.sendHeader("Access-Control-Allow-Headers", "Authorization");
           server.send(200, "text/plain", "Started the scanning of fingers");
         } else if (scan == "stop") {
           scanfingers = false;
+          server.sendHeader("Access-Control-Allow-Origin", "*");
+          server.sendHeader("Access-Control-Allow-Headers", "Authorization");
           server.send(200, "text/plain", "Stopped the scanning of fingers");
 
         } else {
@@ -271,6 +279,7 @@ void registerHandler() {
         int id = server.arg("id").toInt();
         if (id > 0) {
           fingerPrintEnroll(id);
+          server.sendHeader("Access-Control-Allow-Origin", "*");
           server.send(200, "text/plain", "added successfully");
 
         } else {
@@ -318,6 +327,14 @@ void deleteHandler() {
     return;
   }
 }
+
+//void options handler
+void optionsHandler() {
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.sendHeader("Access-Control-Allow-Headers", "Authorization");
+  server.send(200, "text/plain", "OK");
+}
+
 
 //post the id to the server and check if authorized
 
