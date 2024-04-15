@@ -167,7 +167,7 @@ function getStudentUnits()
 }
 function getSessionAttendance(int $id)
 {
-    $stmt = $GLOBALS['conn']->prepare('select UnitCode,Date,Venue,AdmissionNo,Attendend from tbl_Attendance inner join tbl_Sessions on tbl_Sessions.SessionID = tbl_Attendance.SessionID where tbl_Sessions.SessionID=?;');
+    $stmt = $GLOBALS['conn']->prepare('select UnitCode,Date,Venue,AdmissionNo,Attended from tbl_Attendance inner join tbl_Sessions on tbl_Sessions.SessionID = tbl_Attendance.SessionID where tbl_Sessions.SessionID=?;');
     $stmt->bind_param("d", $id);
     $admno = "";
     $unitcode = "";
@@ -500,7 +500,7 @@ function getSessionAttendance(int $id)
 
     <script>
         var available_slot = -1;
-        var rfinger = -1;
+        var rfinger = 1;
         var lfinger = -1;
         var seen = [];
         var intervalId = -1;

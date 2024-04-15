@@ -14,6 +14,8 @@ $stmt->bind_result($num);
 //execute sql
 $stmt->execute();
 $stmt->fetch();
+if($num=="")
+    $num=0;
 echo $num;
 
 ?>

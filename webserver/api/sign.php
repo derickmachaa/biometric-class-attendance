@@ -25,7 +25,7 @@ if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
 
         if (isset($_id) && isset($_sessionid)) {
             // prepare and bind
-            $stmt = $conn->prepare("UPDATE tbl_Attendance join tbl_Fingerprints on tbl_Attendance.AdmissionNo = tbl_Fingerprints.AdmissionNo set tbl_Attendance.Attendend = TRUE 
+            $stmt = $conn->prepare("UPDATE tbl_Attendance join tbl_Fingerprints on tbl_Attendance.AdmissionNo = tbl_Fingerprints.AdmissionNo set tbl_Attendance.Attended = TRUE 
                 where sessionID=? and (tbl_Fingerprints.RightFinger = ? or tbl_Fingerprints.LeftFinger = ?);");
             $stmt->bind_param("ddd", $_sessionid, $_id, $_id);
             //execute sql

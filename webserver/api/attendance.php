@@ -17,7 +17,7 @@ $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-$stmt = $GLOBALS['conn']->prepare('select UnitCode,Date,Venue,AdmissionNo,Attendend from tbl_Attendance inner join tbl_Sessions on tbl_Sessions.SessionID = tbl_Attendance.SessionID where tbl_Sessions.SessionID=?;');
+$stmt = $GLOBALS['conn']->prepare('select UnitCode,Date,Venue,AdmissionNo,Attended from tbl_Attendance inner join tbl_Sessions on tbl_Sessions.SessionID = tbl_Attendance.SessionID where tbl_Sessions.SessionID=?;');
 $id=$_GET['id'];
 $stmt->bind_param("d", $id);
 $admno = "";
